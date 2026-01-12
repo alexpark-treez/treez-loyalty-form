@@ -289,6 +289,8 @@ async function sendClientEmail(data: {
 
 export async function POST(request: NextRequest) {
   try {
+    console.log("Starting form submission...");
+
     const formData = await request.formData();
 
     const dispensaryName = formData.get("dispensaryName") as string;
@@ -303,41 +305,75 @@ export async function POST(request: NextRequest) {
     const icon = formData.get("icon") as File;
     const backgroundImage = formData.get("backgroundImage") as File | null;
 
+    console.log("Form data received:", { dispensaryName, contactName, contactEmail });
+
+    // Check env vars
+    if (!process.env.GOOGLE_SERVICE_ACCOUNT_KEY) {
+      console.error("Missing GOOGLE_SERVICE_ACCOUNT_KEY");
+      return NextResponse.json({ error: "Server configuration error: Missing Google credentials" }, { status: 500 });
+    }
+    if (!process.env.GOOGLE_SHEET_ID) {
+      console.error("Missing GOOGLE_SHEET_ID");
+      return NextResponse.json({ error: "Server configuration error: Missing Sheet ID" }, { status: 500 });
+    }
+    if (!process.env.GOOGLE_DRIVE_FOLDER_ID) {
+      console.error("Missing GOOGLE_DRIVE_FOLDER_ID");
+      return NextResponse.json({ error: "Server configuration error: Missing Drive Folder ID" }, { status: 500 });
+    }
+
     // Get Google Auth
-    const auth = await getGoogleAuth();
+    console.log("Getting Google Auth...");
+    let auth;
+    try {
+      auth = await getGoogleAuth();
+      console.log("Google Auth obtained successfully");
+    } catch (authError) {
+      console.error("Google Auth error:", authError);
+      return NextResponse.json({ error: "Failed to authenticate with Google" }, { status: 500 });
+    }
 
     // Create sanitized folder name
     const folderName = dispensaryName.replace(/[^a-zA-Z0-9\s-]/g, "").trim();
 
     // Upload files to Drive
-    const logoResult = await uploadToDrive(auth, logo, folderName);
-    const iconResult = await uploadToDrive(auth, icon, folderName);
+    console.log("Uploading logo to Drive...");
+    let logoResult;
+    try {
+      logoResult = await uploadToDrive(auth, logo, folderName);
+      console.log("Logo uploaded:", logoResult.webViewLink);
+    } catch (uploadError) {
+      console.error("Logo upload error:", uploadError);
+      return NextResponse.json({ error: "Failed to upload logo to Google Drive" }, { status: 500 });
+    }
+
+    console.log("Uploading icon to Drive...");
+    let iconResult;
+    try {
+      iconResult = await uploadToDrive(auth, icon, folderName);
+      console.log("Icon uploaded:", iconResult.webViewLink);
+    } catch (uploadError) {
+      console.error("Icon upload error:", uploadError);
+      return NextResponse.json({ error: "Failed to upload icon to Google Drive" }, { status: 500 });
+    }
+
     let backgroundResult: DriveUploadResult | null = null;
-    if (backgroundImage) {
-      backgroundResult = await uploadToDrive(auth, backgroundImage, folderName);
+    if (backgroundImage && backgroundImage.size > 0) {
+      console.log("Uploading background to Drive...");
+      try {
+        backgroundResult = await uploadToDrive(auth, backgroundImage, folderName);
+        console.log("Background uploaded:", backgroundResult.webViewLink);
+      } catch (uploadError) {
+        console.error("Background upload error:", uploadError);
+        // Non-fatal, continue without background
+      }
     }
 
     const submittedAt = new Date().toISOString();
 
     // Append to Google Sheet
-    await appendToSheet(auth, {
-      dispensaryName,
-      contactName,
-      contactEmail,
-      website,
-      storeCount,
-      transferringPoints,
-      brandHexCodes,
-      designNotes,
-      logoUrl: logoResult.webViewLink,
-      iconUrl: iconResult.webViewLink,
-      backgroundUrl: backgroundResult?.webViewLink || "",
-      submittedAt,
-    });
-
-    // Send emails
-    await Promise.all([
-      sendAdminEmail({
+    console.log("Appending to Google Sheet...");
+    try {
+      await appendToSheet(auth, {
         dispensaryName,
         contactName,
         contactEmail,
@@ -349,19 +385,49 @@ export async function POST(request: NextRequest) {
         logoUrl: logoResult.webViewLink,
         iconUrl: iconResult.webViewLink,
         backgroundUrl: backgroundResult?.webViewLink || "",
-      }),
-      sendClientEmail({
-        dispensaryName,
-        contactName,
-        contactEmail,
-      }),
-    ]);
+        submittedAt,
+      });
+      console.log("Sheet updated successfully");
+    } catch (sheetError) {
+      console.error("Sheet append error:", sheetError);
+      return NextResponse.json({ error: "Failed to save to Google Sheet" }, { status: 500 });
+    }
 
+    // Send emails
+    console.log("Sending emails...");
+    try {
+      await Promise.all([
+        sendAdminEmail({
+          dispensaryName,
+          contactName,
+          contactEmail,
+          website,
+          storeCount,
+          transferringPoints,
+          brandHexCodes,
+          designNotes,
+          logoUrl: logoResult.webViewLink,
+          iconUrl: iconResult.webViewLink,
+          backgroundUrl: backgroundResult?.webViewLink || "",
+        }),
+        sendClientEmail({
+          dispensaryName,
+          contactName,
+          contactEmail,
+        }),
+      ]);
+      console.log("Emails sent successfully");
+    } catch (emailError) {
+      console.error("Email send error:", emailError);
+      // Non-fatal - data is saved, just email failed
+    }
+
+    console.log("Form submission completed successfully");
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Submission error:", error);
     return NextResponse.json(
-      { error: "Failed to process submission" },
+      { error: `Failed to process submission: ${error instanceof Error ? error.message : 'Unknown error'}` },
       { status: 500 }
     );
   }
