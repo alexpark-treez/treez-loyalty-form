@@ -34,6 +34,8 @@ async function uploadToDrive(
   const folderQuery = await drive.files.list({
     q: `name='${folderName}' and mimeType='application/vnd.google-apps.folder' and '${process.env.GOOGLE_DRIVE_FOLDER_ID}' in parents and trashed=false`,
     fields: "files(id, name)",
+    supportsAllDrives: true,
+    includeItemsFromAllDrives: true,
   });
 
   let subFolderId: string;
@@ -48,6 +50,7 @@ async function uploadToDrive(
         parents: [process.env.GOOGLE_DRIVE_FOLDER_ID!],
       },
       fields: "id",
+      supportsAllDrives: true,
     });
     subFolderId = folderResponse.data.id!;
   }
@@ -71,6 +74,7 @@ async function uploadToDrive(
       body: stream,
     },
     fields: "id, webViewLink",
+    supportsAllDrives: true,
   });
 
   // Make file viewable by anyone with link
@@ -80,6 +84,7 @@ async function uploadToDrive(
       type: "anyone",
       role: "reader",
     },
+    supportsAllDrives: true,
   });
 
   return {
