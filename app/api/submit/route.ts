@@ -77,15 +77,20 @@ async function uploadToDrive(
     supportsAllDrives: true,
   });
 
-  // Make file viewable by anyone with link
-  await drive.permissions.create({
-    fileId: response.data.id!,
-    requestBody: {
-      type: "anyone",
-      role: "reader",
-    },
-    supportsAllDrives: true,
-  });
+  // Try to make file viewable by anyone with link (may fail on some Shared Drives)
+  try {
+    await drive.permissions.create({
+      fileId: response.data.id!,
+      requestBody: {
+        type: "anyone",
+        role: "reader",
+      },
+      supportsAllDrives: true,
+    });
+  } catch (permError) {
+    console.log("Could not set public permissions (Shared Drive may restrict this):", permError);
+    // Non-fatal - file is still accessible to Shared Drive members
+  }
 
   return {
     fileId: response.data.id!,
