@@ -46,6 +46,7 @@ export function LoyaltyForm() {
   const [isLoading, setIsLoading] = useState(true);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [canSubmit, setCanSubmit] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -87,7 +88,7 @@ export function LoyaltyForm() {
   // Auto-save to localStorage
   const watchedValues = form.watch();
   useEffect(() => {
-    if (isLoading) return;
+    if (isLoading || isSubmitted) return;
 
     const timeoutId = setTimeout(() => {
       saveFormDraft({
@@ -209,6 +210,7 @@ export function LoyaltyForm() {
         throw new Error("Submission failed");
       }
 
+      setIsSubmitted(true);
       clearFormDraft();
       setHasUnsavedChanges(false);
       router.push("/thank-you");
