@@ -46,7 +46,7 @@ export function BrandAssetsStep({ form }: BrandAssetsStepProps) {
                   onFileSelect={field.onChange}
                   value={field.value as File | null}
                   imageType="logo"
-                  helperText="480×150px minimum, PNG only, max 3MB"
+                  helperText="Recommended size: 480x150 pixels. The minimum height is 150px. Only PNG format. 3 megabytes."
                   required
                   error={form.formState.errors.logo?.message as string | undefined}
                 />
@@ -70,7 +70,7 @@ export function BrandAssetsStep({ form }: BrandAssetsStepProps) {
                   onFileSelect={field.onChange}
                   value={field.value as File | null}
                   imageType="icon"
-                  helperText="512×512px square, PNG only, max 3MB"
+                  helperText="Recommended icon size: 512x512 pixels. The image must be square. Only PNG format. 3 megabytes."
                   required
                   error={form.formState.errors.icon?.message as string | undefined}
                 />
@@ -95,7 +95,7 @@ export function BrandAssetsStep({ form }: BrandAssetsStepProps) {
                   onFileSelect={field.onChange}
                   value={field.value as File | null}
                   imageType="backgroundImage"
-                  helperText="1125×432px, PNG only, max 3MB"
+                  helperText="The minimum file size is 1125x432 pixels. Only PNG format. 3 megabytes."
                   error={form.formState.errors.backgroundImage?.message as string | undefined}
                 />
               </FormControl>
