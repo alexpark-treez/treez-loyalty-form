@@ -214,15 +214,11 @@ async function sendAdminEmail(data: {
   iconUrl: string;
   backgroundUrl: string;
 }) {
-  // Support multiple admin emails (comma-separated in env var)
-  const adminEmails = (process.env.ADMIN_EMAIL || "alex.park@treez.io")
-    .split(",")
-    .map((email) => email.trim())
-    .filter((email) => email.length > 0);
+  const adminEmail = process.env.ADMIN_EMAIL || "alex.park@treez.io";
 
   await resend.emails.send({
     from: "Treez Loyalty <onboarding@resend.dev>",
-    to: adminEmails,
+    to: adminEmail,
     subject: `New Loyalty Onboarding: ${data.dispensaryName}`,
     html: `
       <!DOCTYPE html>
