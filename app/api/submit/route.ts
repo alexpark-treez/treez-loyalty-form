@@ -99,6 +99,45 @@ async function uploadToDrive(
   };
 }
 
+const SHEET_HEADERS = [
+  "Submitted At",
+  "Dispensary Name",
+  "Contact Name",
+  "Contact Email",
+  "Website",
+  "Store Count",
+  "Transferring Points",
+  "Brand Hex Codes",
+  "Design Notes",
+  "Logo URL",
+  "Icon URL",
+  "Background URL",
+];
+
+async function ensureSheetHeaders(
+  sheets: ReturnType<typeof google.sheets>,
+  spreadsheetId: string
+) {
+  // Check if row 1 has headers
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId,
+    range: "Sheet1!A1:L1",
+  });
+
+  const firstRow = response.data.values?.[0];
+
+  // If no data or first cell doesn't match expected header, add headers
+  if (!firstRow || firstRow[0] !== SHEET_HEADERS[0]) {
+    // Insert headers at row 1
+    await sheets.spreadsheets.values.update({
+      spreadsheetId,
+      range: "Sheet1!A1:L1",
+      valueInputOption: "USER_ENTERED",
+      requestBody: { values: [SHEET_HEADERS] },
+    });
+  }
+}
+
 async function appendToSheet(
   auth: Awaited<ReturnType<typeof getGoogleAuth>>,
   data: {
@@ -117,6 +156,10 @@ async function appendToSheet(
   }
 ) {
   const sheets = google.sheets({ version: "v4", auth });
+  const spreadsheetId = process.env.GOOGLE_SHEET_ID?.trim() || "";
+
+  // Ensure headers exist
+  await ensureSheetHeaders(sheets, spreadsheetId);
 
   const values = [
     [
@@ -136,7 +179,7 @@ async function appendToSheet(
   ];
 
   await sheets.spreadsheets.values.append({
-    spreadsheetId: process.env.GOOGLE_SHEET_ID?.trim(),
+    spreadsheetId,
     range: "Sheet1!A:L",
     valueInputOption: "USER_ENTERED",
     requestBody: { values },
