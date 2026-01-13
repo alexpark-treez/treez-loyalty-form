@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, AnimatePresence } from "framer-motion";
@@ -47,6 +47,7 @@ export function LoyaltyForm() {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [canSubmit, setCanSubmit] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const isSubmittedRef = useRef(false);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -88,9 +89,12 @@ export function LoyaltyForm() {
   // Auto-save to localStorage
   const watchedValues = form.watch();
   useEffect(() => {
-    if (isLoading || isSubmitted) return;
+    if (isLoading || isSubmittedRef.current) return;
 
     const timeoutId = setTimeout(() => {
+      // Double-check ref in case submission happened while timeout was pending
+      if (isSubmittedRef.current) return;
+
       saveFormDraft({
         dispensaryName: watchedValues.dispensaryName,
         contactName: watchedValues.contactName,
@@ -210,6 +214,7 @@ export function LoyaltyForm() {
         throw new Error("Submission failed");
       }
 
+      isSubmittedRef.current = true;
       setIsSubmitted(true);
       clearFormDraft();
       setHasUnsavedChanges(false);
