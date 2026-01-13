@@ -118,6 +118,8 @@ async function ensureSheetHeaders(
   sheets: ReturnType<typeof google.sheets>,
   spreadsheetId: string
 ) {
+  console.log("Checking for sheet headers...");
+
   // Check if row 1 has headers
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId,
@@ -125,9 +127,11 @@ async function ensureSheetHeaders(
   });
 
   const firstRow = response.data.values?.[0];
+  console.log("First row data:", firstRow);
 
   // If no data or first cell doesn't match expected header, add headers
   if (!firstRow || firstRow[0] !== SHEET_HEADERS[0]) {
+    console.log("Adding headers to sheet...");
     // Insert headers at row 1
     await sheets.spreadsheets.values.update({
       spreadsheetId,
@@ -135,6 +139,9 @@ async function ensureSheetHeaders(
       valueInputOption: "USER_ENTERED",
       requestBody: { values: [SHEET_HEADERS] },
     });
+    console.log("Headers added successfully");
+  } else {
+    console.log("Headers already exist");
   }
 }
 
