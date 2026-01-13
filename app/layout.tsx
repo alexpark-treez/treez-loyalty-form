@@ -14,7 +14,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://treez-loyalty-form-i2lz-teal.treezecomm.app"),
+  metadataBase: new URL("https://treez-loyalty.treezecomm.app"),
   title: "Treez Loyalty Onboarding",
   description: "Get started with Treez Loyalty - Submit your brand assets",
   keywords: ["treez", "loyalty", "dispensary", "cannabis", "retail"],

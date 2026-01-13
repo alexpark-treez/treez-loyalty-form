@@ -166,6 +166,11 @@ export function LoyaltyForm() {
   };
 
   const onSubmit = async (data: FormData) => {
+    // Only allow submission from step 3 (review step)
+    if (currentStep !== 3) {
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {

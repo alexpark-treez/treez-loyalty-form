@@ -136,7 +136,7 @@ async function appendToSheet(
   ];
 
   await sheets.spreadsheets.values.append({
-    spreadsheetId: process.env.GOOGLE_SHEET_ID,
+    spreadsheetId: process.env.GOOGLE_SHEET_ID?.trim(),
     range: "Sheet1!A:L",
     valueInputOption: "USER_ENTERED",
     requestBody: { values },
@@ -230,7 +230,7 @@ async function sendAdminEmail(data: {
             </div>
 
             <p style="margin-top: 24px;">
-              <a href="https://docs.google.com/spreadsheets/d/${process.env.GOOGLE_SHEET_ID}" class="link" style="font-weight: 600;">View in Google Sheet &rarr;</a>
+              <a href="https://docs.google.com/spreadsheets/d/${process.env.GOOGLE_SHEET_ID?.trim()}" class="link" style="font-weight: 600;">View in Google Sheet &rarr;</a>
             </p>
           </div>
           <div class="footer">
