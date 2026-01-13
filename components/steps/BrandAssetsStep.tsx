@@ -8,10 +8,9 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { FileUpload } from "@/components/FileUpload";
-import { ColorSwatches } from "@/components/ColorSwatches";
+import { ColorInput } from "@/components/ColorInput";
 import { InfoTooltip } from "@/components/InfoTooltip";
 import { FormData } from "@/lib/schema";
 
@@ -20,8 +19,6 @@ interface BrandAssetsStepProps {
 }
 
 export function BrandAssetsStep({ form }: BrandAssetsStepProps) {
-  const brandHexCodes = form.watch("brandHexCodes");
-
   return (
     <div className="space-y-6">
       <div className="space-y-1">
@@ -104,24 +101,69 @@ export function BrandAssetsStep({ form }: BrandAssetsStepProps) {
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="brandHexCodes"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                Brand Hex Codes
-                <InfoTooltip content="Your brand colors in hex format for design consistency" />
-                <span className="text-muted-foreground font-normal ml-1">(Optional)</span>
-              </FormLabel>
-              <FormControl>
-                <Input placeholder="#6ABF4B, #000000" {...field} />
-              </FormControl>
-              <ColorSwatches hexString={brandHexCodes || ""} />
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="space-y-2">
+          <h3 className="text-lg font-medium flex items-center gap-2">
+            Colors
+            <InfoTooltip content="Your brand colors for the loyalty card design" />
+            <span className="text-muted-foreground font-normal text-sm">(Optional)</span>
+          </h3>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="cardBackgroundColor"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Card background</FormLabel>
+                  <FormControl>
+                    <ColorInput
+                      value={field.value || ""}
+                      onChange={field.onChange}
+                      placeholder="#FFFFFF"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="textColor"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Text color</FormLabel>
+                  <FormControl>
+                    <ColorInput
+                      value={field.value || ""}
+                      onChange={field.onChange}
+                      placeholder="#000000"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <FormField
+            control={form.control}
+            name="centerBackgroundColor"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Background color of the center part</FormLabel>
+                <FormControl>
+                  <ColorInput
+                    value={field.value || ""}
+                    onChange={field.onChange}
+                    placeholder="#F6F6F6"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <FormField
           control={form.control}

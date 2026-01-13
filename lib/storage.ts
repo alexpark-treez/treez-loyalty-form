@@ -7,7 +7,9 @@ export interface StoredFormData {
   website: string;
   storeCount: number;
   transferringPoints: "yes" | "no" | "";
-  brandHexCodes: string;
+  cardBackgroundColor: string;
+  textColor: string;
+  centerBackgroundColor: string;
   designNotes: string;
   currentStep: number;
   lastUpdated: string;

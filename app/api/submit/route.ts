@@ -107,7 +107,9 @@ const SHEET_HEADERS = [
   "Website",
   "Store Count",
   "Transferring Points",
-  "Brand Hex Codes",
+  "Card Background Color",
+  "Text Color",
+  "Center Background Color",
   "Design Notes",
   "Logo URL",
   "Icon URL",
@@ -123,7 +125,7 @@ async function ensureSheetHeaders(
   // Check if row 1 has headers
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId,
-    range: "Sheet1!A1:L1",
+    range: "Sheet1!A1:N1",
   });
 
   const firstRow = response.data.values?.[0];
@@ -135,7 +137,7 @@ async function ensureSheetHeaders(
     // Insert headers at row 1
     await sheets.spreadsheets.values.update({
       spreadsheetId,
-      range: "Sheet1!A1:L1",
+      range: "Sheet1!A1:N1",
       valueInputOption: "USER_ENTERED",
       requestBody: { values: [SHEET_HEADERS] },
     });
@@ -154,7 +156,9 @@ async function appendToSheet(
     website: string;
     storeCount: string;
     transferringPoints: string;
-    brandHexCodes: string;
+    cardBackgroundColor: string;
+    textColor: string;
+    centerBackgroundColor: string;
     designNotes: string;
     logoUrl: string;
     iconUrl: string;
@@ -177,7 +181,9 @@ async function appendToSheet(
       data.website,
       data.storeCount,
       data.transferringPoints,
-      data.brandHexCodes,
+      data.cardBackgroundColor,
+      data.textColor,
+      data.centerBackgroundColor,
       data.designNotes,
       data.logoUrl,
       data.iconUrl,
@@ -187,7 +193,7 @@ async function appendToSheet(
 
   await sheets.spreadsheets.values.append({
     spreadsheetId,
-    range: "Sheet1!A:L",
+    range: "Sheet1!A:N",
     valueInputOption: "USER_ENTERED",
     requestBody: { values },
   });
@@ -200,7 +206,9 @@ async function sendAdminEmail(data: {
   website: string;
   storeCount: string;
   transferringPoints: string;
-  brandHexCodes: string;
+  cardBackgroundColor: string;
+  textColor: string;
+  centerBackgroundColor: string;
   designNotes: string;
   logoUrl: string;
   iconUrl: string;
@@ -263,8 +271,16 @@ async function sendAdminEmail(data: {
 
             <h2>Brand Assets</h2>
             <div class="field">
-              <div class="label">Brand Colors</div>
-              <div class="value">${data.brandHexCodes || "Not provided"}</div>
+              <div class="label">Card Background Color</div>
+              <div class="value">${data.cardBackgroundColor || "Not provided"}</div>
+            </div>
+            <div class="field">
+              <div class="label">Text Color</div>
+              <div class="value">${data.textColor || "Not provided"}</div>
+            </div>
+            <div class="field">
+              <div class="label">Center Background Color</div>
+              <div class="value">${data.centerBackgroundColor || "Not provided"}</div>
             </div>
             <div class="field">
               <div class="label">Design Notes</div>
@@ -359,7 +375,9 @@ export async function POST(request: NextRequest) {
     const website = formData.get("website") as string;
     const storeCount = formData.get("storeCount") as string;
     const transferringPoints = formData.get("transferringPoints") as string;
-    const brandHexCodes = formData.get("brandHexCodes") as string;
+    const cardBackgroundColor = formData.get("cardBackgroundColor") as string;
+    const textColor = formData.get("textColor") as string;
+    const centerBackgroundColor = formData.get("centerBackgroundColor") as string;
     const designNotes = formData.get("designNotes") as string;
     const logo = formData.get("logo") as File;
     const icon = formData.get("icon") as File;
@@ -440,7 +458,9 @@ export async function POST(request: NextRequest) {
         website,
         storeCount,
         transferringPoints,
-        brandHexCodes,
+        cardBackgroundColor,
+        textColor,
+        centerBackgroundColor,
         designNotes,
         logoUrl: logoResult.webViewLink,
         iconUrl: iconResult.webViewLink,
@@ -464,7 +484,9 @@ export async function POST(request: NextRequest) {
           website,
           storeCount,
           transferringPoints,
-          brandHexCodes,
+          cardBackgroundColor,
+          textColor,
+          centerBackgroundColor,
           designNotes,
           logoUrl: logoResult.webViewLink,
           iconUrl: iconResult.webViewLink,

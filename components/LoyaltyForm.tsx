@@ -60,7 +60,9 @@ export function LoyaltyForm() {
       logo: undefined,
       icon: undefined,
       backgroundImage: undefined,
-      brandHexCodes: "",
+      cardBackgroundColor: "",
+      textColor: "",
+      centerBackgroundColor: "",
       designNotes: "",
     },
     mode: "onChange",
@@ -78,7 +80,9 @@ export function LoyaltyForm() {
       if (draft.transferringPoints) {
         form.setValue("transferringPoints", draft.transferringPoints as "yes" | "no");
       }
-      if (draft.brandHexCodes) form.setValue("brandHexCodes", draft.brandHexCodes);
+      if (draft.cardBackgroundColor) form.setValue("cardBackgroundColor", draft.cardBackgroundColor);
+      if (draft.textColor) form.setValue("textColor", draft.textColor);
+      if (draft.centerBackgroundColor) form.setValue("centerBackgroundColor", draft.centerBackgroundColor);
       if (draft.designNotes) form.setValue("designNotes", draft.designNotes);
       if (draft.currentStep) setCurrentStep(draft.currentStep);
     }
@@ -101,7 +105,9 @@ export function LoyaltyForm() {
         website: watchedValues.website,
         storeCount: watchedValues.storeCount,
         transferringPoints: watchedValues.transferringPoints || "",
-        brandHexCodes: watchedValues.brandHexCodes || "",
+        cardBackgroundColor: watchedValues.cardBackgroundColor || "",
+        textColor: watchedValues.textColor || "",
+        centerBackgroundColor: watchedValues.centerBackgroundColor || "",
         designNotes: watchedValues.designNotes || "",
         currentStep,
       });
@@ -197,7 +203,9 @@ export function LoyaltyForm() {
       formData.append("website", data.website);
       formData.append("storeCount", data.storeCount.toString());
       formData.append("transferringPoints", data.transferringPoints);
-      formData.append("brandHexCodes", data.brandHexCodes || "");
+      formData.append("cardBackgroundColor", data.cardBackgroundColor || "");
+      formData.append("textColor", data.textColor || "");
+      formData.append("centerBackgroundColor", data.centerBackgroundColor || "");
       formData.append("designNotes", data.designNotes || "");
 
       if (data.logo) formData.append("logo", data.logo);

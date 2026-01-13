@@ -17,7 +17,9 @@ export const brandAssetsSchema = z.object({
   logo: z.custom<File>((val) => val instanceof File, "Logo is required"),
   icon: z.custom<File>((val) => val instanceof File, "Icon is required"),
   backgroundImage: z.custom<File>().optional().nullable(),
-  brandHexCodes: z.string().optional(),
+  cardBackgroundColor: z.string().optional(),
+  textColor: z.string().optional(),
+  centerBackgroundColor: z.string().optional(),
   designNotes: z.string().optional(),
 });
 

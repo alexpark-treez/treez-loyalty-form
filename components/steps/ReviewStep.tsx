@@ -183,12 +183,40 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
               )}
             </div>
 
-            {values.brandHexCodes && (
+            {(values.cardBackgroundColor || values.textColor || values.centerBackgroundColor) && (
               <div>
-                <p className="text-sm font-medium text-muted-foreground mb-1">
-                  Brand Colors
+                <p className="text-sm font-medium text-muted-foreground mb-2">
+                  Colors
                 </p>
-                <p className="text-sm">{values.brandHexCodes}</p>
+                <div className="flex flex-wrap gap-4">
+                  {values.cardBackgroundColor && (
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="w-6 h-6 rounded border"
+                        style={{ backgroundColor: values.cardBackgroundColor }}
+                      />
+                      <span className="text-sm">Card: {values.cardBackgroundColor}</span>
+                    </div>
+                  )}
+                  {values.textColor && (
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="w-6 h-6 rounded border"
+                        style={{ backgroundColor: values.textColor }}
+                      />
+                      <span className="text-sm">Text: {values.textColor}</span>
+                    </div>
+                  )}
+                  {values.centerBackgroundColor && (
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="w-6 h-6 rounded border"
+                        style={{ backgroundColor: values.centerBackgroundColor }}
+                      />
+                      <span className="text-sm">Center: {values.centerBackgroundColor}</span>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
