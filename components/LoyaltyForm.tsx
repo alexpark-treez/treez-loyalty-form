@@ -45,6 +45,7 @@ export function LoyaltyForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [canSubmit, setCanSubmit] = useState(false);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -119,6 +120,17 @@ export function LoyaltyForm() {
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [hasUnsavedChanges]);
 
+  // Prevent accidental submission when transitioning to step 3
+  useEffect(() => {
+    if (currentStep === 3) {
+      setCanSubmit(false);
+      const timer = setTimeout(() => setCanSubmit(true), 500);
+      return () => clearTimeout(timer);
+    } else {
+      setCanSubmit(false);
+    }
+  }, [currentStep]);
+
   const validateCurrentStep = useCallback(async () => {
     const values = form.getValues();
 
@@ -166,8 +178,8 @@ export function LoyaltyForm() {
   };
 
   const onSubmit = async (data: FormData) => {
-    // Only allow submission from step 3 (review step)
-    if (currentStep !== 3) {
+    // Only allow submission from step 3 (review step) after delay
+    if (currentStep !== 3 || !canSubmit) {
       return;
     }
 
@@ -273,7 +285,7 @@ export function LoyaltyForm() {
           ) : (
             <Button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !canSubmit}
               className="gap-2 min-w-[140px]"
             >
               {isSubmitting ? (
