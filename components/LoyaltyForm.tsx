@@ -46,7 +46,6 @@ export function LoyaltyForm() {
   const [isLoading, setIsLoading] = useState(true);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [canSubmit, setCanSubmit] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
   const isSubmittedRef = useRef(false);
 
   const form = useForm<FormData>({
@@ -215,7 +214,6 @@ export function LoyaltyForm() {
       }
 
       isSubmittedRef.current = true;
-      setIsSubmitted(true);
       clearFormDraft();
       setHasUnsavedChanges(false);
       router.push("/thank-you");
